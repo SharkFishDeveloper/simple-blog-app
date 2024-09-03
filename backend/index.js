@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import DB_URL from "./DB_URL.js";
 import {z} from "zod"
 import User from "./model/model.js";
+import axios from "axios";
 
 
 const app = express();
@@ -57,6 +58,11 @@ app.post("/signup",async (req,res)=>{
     return res.json({message:"SUCCESS",username:name,email,password,createdAt:Date.now()});
 })
 
+
+app.get("/json",async(req,res)=>{
+    const result  = await axios.get("https://jsonplaceholder.typicode.com/posts");
+    return res.json({response:result.data});
+})
 
 //* just listening on port 3000
 app.listen(3000,()=>console.log(`Server running on ${3000}`))
