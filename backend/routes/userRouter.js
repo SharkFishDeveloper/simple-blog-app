@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import JWT_SECRET from "../util/SECURITY.js";
 import {z} from "zod"
-import User from "../model/model.js";
+import {User} from "../model/model.js";
 import axios from "axios";
 
 

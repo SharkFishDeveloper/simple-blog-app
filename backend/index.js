@@ -3,6 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import DB_URL from "./DB_URL.js";
 import userRouter from "./routes/userRouter.js";
+import blogRouter from "./routes/blogRouter.js";
+import { BlogCategory } from "./util/ENUMS.js";
 
 
 const app = express();
@@ -21,8 +23,9 @@ app.get("/",(req,res)=>{
 })
 
 
-
 app.use("/user",userRouter);
+app.use("/blog",blogRouter);
+
 
 
 //* just listening on port 3000
