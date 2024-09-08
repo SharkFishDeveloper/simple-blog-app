@@ -20,15 +20,22 @@ const userRouter = express.Router();
 
 userRouter.post("/signup",async(req,res)=>{
     const {name,email,password} = req.body;
+    //* parse req.body to check if they are of proper format
     const result = userZod.safeParse({name,email,password});
     if (!result.success) {
         return res.status(400).json({ errors: result.error.errors.map((i)=>
         {
-            return res.json({message:i.message})
+            return res.json({message:i.message}).status(400);
         }
         )});
     }
-    //* just creating a new user
+    //* ----END----
+    
+    const checkUser = await User.findOne({name,email});
+    if(checkUser !== null){ // if checkUser is not null
+        return res.json({message:"User already exists"}).status(400);
+    }
+    
     const newUser  =  new User({
         name,
         email,
@@ -36,27 +43,36 @@ userRouter.post("/signup",async(req,res)=>{
     })
 
     
-    
     try {
         const id = newUser._id.toString();
-        const token = jwt.sign({id},JWT_SECRET);
-        console.log("YOUR TOKEN is -> ",token);
-        newUser.save();
-        console.log("NEW USER CREATED");
-        //jwt be -> fe -> save in cookies
-    
+        //* encyrpt the userId
+        const token = jwt.sign({userId:id},JWT_SECRET);
+        await newUser.save();
+        //* extract something from token    
+        const userIdDecoded = jwt.verify(token,JWT_SECRET)
+        res.cookie("user-token",token);
+        return res.json({"message":"Signup success"}).status(200);
+
     } catch (error) {
-        console.log("ERROR->",error);
-        
     }
 
-    return res.json({message:"SUCCESS",username:name,email,password,createdAt:Date.now()});
+    return res.json({message:"SUCCESS",username:name,email,password,createdAt:Date.now()}).status(400);
 })
 
-userRouter.get("/decode",(req,res)=>{
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZGM2YWI0ZTJkMzE3MDhjMDhkNjI3OSIsImlhdCI6MTcyNTcyMTI2OH0.87_A4mxoORMSFmlgD6UICrg3Dby7im8eX_yTW2tnapA";
-    const userIdDecoded = jwt.verify(token,JWT_SECRET)
-    return res.json({"message":userIdDecoded})
+
+userRouter.post("/login",async(req,res)=>{
+    const {email,password} = req.body;
+    const checkUser = await User.findOne({email,password});
+    if(checkUser === null){ 
+        return res.json({message:"User doesnot exist. PLease signup !!"}).status(400)
+    }
+    const id = checkUser._id.toString();
+    //* key to enter website
+    const token = jwt.sign({userId:id},JWT_SECRET);
+    //* save cookie in Frontend
+    res.cookie("user-token",token);
+    return res.json({message:"Log in success !!"}).status(200)
 })
+
 
 export default userRouter;
