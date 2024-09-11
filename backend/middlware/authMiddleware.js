@@ -17,13 +17,12 @@ const authMiddlware = async(req,res,next)=>{
     }
 }
 
-const readBlogAuthMiddleware = async (req, res) => {
+const readBlogAuthMiddleware = async (req, res,next) => {
     try {
         const token = req.header("Authorization"); // should be same as login token
         if(!token){
             return res.status(401).json({ message: "Please login !!" }).status(303);
         }
-        
         next();
 
     } catch (error) {
