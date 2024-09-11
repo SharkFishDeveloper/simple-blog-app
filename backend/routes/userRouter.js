@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import JWT_SECRET from "../util/SECURITY.js";
 import {z} from "zod"
 import {User} from "../model/model.js";
-import axios from "axios";
 
 
 const userZod = z.object({
@@ -47,9 +46,7 @@ userRouter.post("/signup",async(req,res)=>{
         const id = newUser._id.toString();
         //* encyrpt the userId
         const token = jwt.sign({userId:id},JWT_SECRET);
-        await newUser.save();
-        //* extract something from token    
-        const userIdDecoded = jwt.verify(token,JWT_SECRET)
+        await newUser.save(); 
         res.cookie("user-token",token);
         return res.json({"message":"Signup success"}).status(200);
 
@@ -66,7 +63,7 @@ userRouter.post("/login",async(req,res)=>{
     if(checkUser === null){ 
         return res.json({message:"User doesnot exist. PLease signup !!"}).status(400)
     }
-    const id = checkUser._id.toString();
+    const id = checkUser._id.toString()
     //* key to enter website
     const token = jwt.sign({userId:id},JWT_SECRET);
     //* save cookie in Frontend
