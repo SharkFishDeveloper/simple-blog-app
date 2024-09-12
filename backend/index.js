@@ -9,7 +9,14 @@ import { BlogCategory } from "./util/ENUMS.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors(
+   {
+    origin:'http://localhost:5173',
+    allowedHeaders:['Content-type','Authorization'],
+    credentials:true
+   }
+));
+
 app.use(express.json())
 
 
